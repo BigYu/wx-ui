@@ -1,0 +1,27 @@
+<style lang="less">
+</style>
+
+<template lang="wxml">
+  <view class="page-container">
+    <view class="index_container">
+      <button type="primary" bindtap="onNewButtonTab">New Appointment</button>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class IndexPage extends wepy.page {
+  config = {};
+  components = {};
+
+  data = {};
+  methods = {
+
+  };
+
+  events = {};
+  onLoad() {};
+  onNewButtonTab() { wx.navigateTo({ url: 'create' });}
+}
+</script>

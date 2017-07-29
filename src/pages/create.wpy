@@ -1,0 +1,142 @@
+<style></style>
+<template>
+  <view class="page-container">
+    <form bindsubmit="onSubmit" bindReset="onReset" report-submit="true">
+      <view class="section">
+        <input placeholder="请输入标题" bindinput="onTitleChange" value="{{title}}"></input>
+      </view>
+      <view class="section">
+        <input placeholder="请选择地点" bindinput="onLocationTextInput" value="{{location.name}}"></input>
+        <text>{{location.address}}</text>
+        <button type="default" size="mini" bindtap="chooseFromMap">在地图中选择</button>
+      </view>
+      <view class="section">
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="picker">
+            开始日期: {{startDate}}
+          </view>
+        </picker>
+        <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
+          <view class="picker">
+            开始时间: {{startTime}}
+          </view>
+        </picker>
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="picker">
+            结束日期: {{endDate}}
+          </view>
+        </picker>
+        <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+          <view class="picker">
+            结束时间: {{endTime}}
+          </view>
+        </picker>
+      </view>
+      <view class="section">
+        <textarea placeholder="输入更多描述" bindinput="onDescriptionInput"></textarea>
+      </view>
+      <view class="section">
+        <button type="primary" form-type="submit">确认并发送</button>
+        <button form-type="reset">清空</button>
+      </view>
+    </form>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+import _ from 'underscore';
+
+const WECHAT_MESSAGE_TEMPLATE_ID = 'NRrKOKEW1pZNSCny-ifqkgvr8tonru6332eaiqbPC68';
+const REQUEST_TOKEN_URL = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx63169140f64618c0&secret=9ebc66012550b0140c3dcea2443a3495';
+const SEND_MESSAGE_URL = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token={{ACCESS_TOKEN}}';
+
+const formatMinutes = (minute) => minute < 10 ? `0${minute}` : minute.toString();
+
+const currentDateTime = new Date();
+const startDateTime = currentDateTime.getMinutes() < 30 ?
+  new Date(currentDateTime.getFullYear(), currentDateTime.getMonth(), currentDateTime.getDate(), currentDateTime.getHours(), 30) :
+  new Date(currentDateTime.getFullYear(), currentDateTime.getMonth(), currentDateTime.getDate(), currentDateTime.getHours() + 1, 0)
+const endDateTime = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate(), startDateTime.getHours(), startDateTime.getMinutes() + 30)
+
+const initStartDate = `${startDateTime.getFullYear()}-${startDateTime.getMonth() + 1}-${startDateTime.getDate()}`;
+const initStartTime = `${startDateTime.getHours()}:${formatMinutes(startDateTime.getMinutes())}`;
+const initEndDate = `${endDateTime.getFullYear()}-${endDateTime.getMonth() + 1}-${endDateTime.getDate()}`;
+const initEndTime = `${endDateTime.getHours()}:${formatMinutes(endDateTime.getMinutes())}`;
+
+export default class CreatePage extends wepy.page {
+  data = {
+    title: '',
+    location: {},
+    startDate: initStartDate,
+    startTime: initStartTime,
+    endDate: initEndDate,
+    endTime: initEndTime,
+    description: '',
+  }
+
+  config = {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "请输入邀请信息",
+    "navigationBarTextStyle": "black"
+  }
+
+  watch = {
+    location(newLocation) {
+      if (_.isEmpty(this.title)) {
+        this.title = `位于${newLocation.name}的新事件`;
+      }
+    }
+  }
+
+  onTitleChange(e) {
+    this.title = e.detail.value;
+  }
+
+  onLocationTextInput(e) {
+    this.location = {
+      name: e.detail.value,
+    };
+  }
+
+  chooseFromMap() {
+    const that = this;
+
+    wx.chooseLocation({
+      success(location) {
+        that.location = location;
+        that.$apply();
+      }
+    })
+  }
+
+  onStartDateChange(e) {
+    this.startDate = e.detail.value;
+  }
+
+  onStartTimeChange(e) {
+    this.startTime = e.detail.value;
+  }
+
+  onEndDateChange(e) {
+    this.endDate = e.detail.value;
+  }
+
+  onEndTimeChange(e) {
+    this.endTime = e.detail.value;
+  }
+
+  onDescriptionInput(e) {
+    this.description = e.detail.value;
+  }
+
+  onSubmit() {
+    wx.request({
+      url: REQUEST_TOKEN_URL,
+      success: (response) => {
+        console.log(response);
+      }
+    });
+  }
+}
+</script>

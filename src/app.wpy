@@ -1,0 +1,41 @@
+<style lang="less">
+.pull-left {
+  float: left;
+}
+.placeholder {
+  text-align: center;
+}
+.page-container {
+  margin: 1em;
+}
+
+.section {
+  padding: 1em 0;
+}
+
+.section + .section {
+  border-top: 1px solid black;
+}
+
+button {
+  margin-top: 1em;
+}
+</style>
+
+<script>
+import wepy from 'wepy';
+export default class extends wepy.app {
+  config = {
+    "pages":[
+      "pages/index",
+      'pages/create'
+    ],
+    "window":{
+      "backgroundTextStyle": "light",
+      "navigationBarBackgroundColor": "#fff",
+      "navigationBarTitleText": "WxAppointment",
+      "navigationBarTextStyle": "black"
+    }
+  };
+}
+</script>
